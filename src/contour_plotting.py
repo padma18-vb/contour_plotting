@@ -2,8 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import corner
 from matplotlib.patches import Patch
-from .contour_plotting import *
-from setuptools import setup, find_packages
+
 
 
 CORNER_KWARGS = dict(
@@ -72,15 +71,12 @@ def make_contour(
     fig, ax = plt.subplots(
         exemplar_dist.shape[1], exemplar_dist.shape[1], figsize=(20, 22)
     )
-    if show_every_title:
-        title_color = "white"
-        title_fontsize = 1
-    else:
-        title_color = colors[-1]
-        try:
-            title_fontsize = CORNER_KWARGS["title_kwargs"]["fontsize"]
-        except:
-            title_fontsize = 30
+
+    title_color = colors[-1]
+    try:
+        title_fontsize = CORNER_KWARGS["title_kwargs"]["fontsize"]
+    except:
+        title_fontsize = 50
     try:
         CORNER_KWARGS["title_kwargs"].update(color=title_color, fontsize=title_fontsize)
     except:
@@ -145,40 +141,27 @@ def make_contour(
                     transform=ax.transAxes,
                     bbox=props1,
                 )
+        
+        if show_every_title and i<len(list_of_dists)-1:
+            color_i = colors[i]
+            inch = 0.1*i
+            for panel in range(len(fig.axes)):
+                ax = fig.axes[panel]
+                titles_curr = ax.get_title("left")
+                if titles_curr=='':
+                    continue
+                ax.text(
+                    0,
+                    1.25 - inch,
+                    titles_curr,
+                    color=color_i,
+                    weight=5,
+                    fontsize=title_fontsize,
+                    transform=ax.transAxes,
+                )
         i += 1
-        if show_every_title:
-            titles_old = []
-            for ax in fig.axes:
-                # print(ax.get_title('left'))
-                titles_old.append(ax.get_title("left"))
-            titles_old = np.array(titles_old)
-            titles_old = titles_old.reshape(
-                i,
-                len(titles_old) // i,
-            ).T
-            new_tit_i = 0
 
-            for ax in fig.axes:
-                curr_ax_title = ax.get_title("left")
-                if curr_ax_title != "":
-                    titles_curr = titles_old[new_tit_i]
-                    color_i = 0
-                    inch = 0
-                    for tit in titles_curr:
-                        ax.text(
-                            0,
-                            1.25 - inch,
-                            tit,
-                            color=colors[color_i],
-                            weight=5,
-                            fontsize=35,
-                            transform=ax.transAxes,
-                        )
-                        inch += 0.1
-                        color_i += 1
-                    new_tit_i += i
 
-        # titles_old.append(ax.get_title('left'))
     # print(np.array(fig.get_axes()).shape)
 
     fig.legend(
